@@ -7,14 +7,14 @@ function AddCampaigns() {
 
   useEffect(() => {
     axios
-      .get("https://winexch.blog/api/campaigns")
+      .get("http://localhost:5000/api/campaigns")
       .then((res) => setCampaigns(res.data))
       .catch((err) => console.error(err));
   }, []);
 
   const deleteCampaign = (id) => {
     axios
-      .delete(`https://winexch.blog/api/campaigns/${id}`)
+      .delete(`http://localhost:5000/api/campaigns/${id}`)
       .then(() => setCampaigns(campaigns.filter((c) => c._id !== id)))
       .catch((err) => console.error(err));
   };

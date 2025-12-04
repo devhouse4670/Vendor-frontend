@@ -1,5 +1,5 @@
 // src/config/api.js (Frontend)
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://winexch.blog';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export const API_ENDPOINTS = {
   // Vendor endpoints

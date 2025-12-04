@@ -51,7 +51,7 @@ export default function UserDashboard() {
   const fetchVendors = async (userId) => {
     try {
       const res = await fetch(
-        `https://winexch.blog/api/data/vendors/user/${userId}`
+        `http://localhost:5000/api/data/vendors/user/${userId}`
       );
       const data = await res.json();
       console.log("Fetched vendors:", data);
@@ -71,7 +71,7 @@ export default function UserDashboard() {
   const fetchCampaigns = async (userId) => {
     try {
       const res = await fetch(
-        `https://winexch.blog/api/data/campaigns/user/${userId}`
+        `http://localhost:5000/api/data/campaigns/user/${userId}`
       );
       const data = await res.json();
       console.log("Fetched campaigns:", data);

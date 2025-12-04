@@ -99,7 +99,7 @@ const AddCampaign = ({ vendorId, vendorName, onClose }) => {
       };
 
       const res = await axios.post(
-        "https://winexch.blog/api/campaigns",
+        "http://localhost:5000/api/campaigns",
         campaignData
       );
 

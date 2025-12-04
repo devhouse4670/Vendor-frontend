@@ -17,7 +17,7 @@ const EditVendor = () => {
   });
 
   useEffect(() => {
-    axios.get(`https://winexch.blog/api/data/vendors/${id}`)
+    axios.get(`http://localhost:5000/api/data/vendors/${id}`)
       .then((res) => setVendor(res.data))
       .catch((err) => console.log(err));
   }, [id]);

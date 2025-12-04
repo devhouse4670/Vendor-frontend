@@ -25,7 +25,7 @@ const VendorCampaigns = () => {
 
   const fetchVendor = async () => {
     try {
-      const response = await fetch(`https://winexch.blog/api/vendors/${vendorId}`);
+      const response = await fetch(`http://localhost:5000/api/vendors/${vendorId}`);
       
       const data = await response.json();
       setVendor(data);
@@ -37,7 +37,7 @@ const VendorCampaigns = () => {
   const fetchCampaigns = async () => {
     try {
       const res = await fetch(
-        `https://winexch.blog/api/campaigns/vendor/${vendorId}`
+        `http://localhost:5000/api/campaigns/vendor/${vendorId}`
       );
       const data = await res.json();
       setCampaigns(data);
@@ -70,7 +70,7 @@ const VendorCampaigns = () => {
   const handleUpdate = async (updatedData) => {
     try {
       const response = await fetch(
-        `https://winexch.blog/api/campaigns/${selectedCampaign._id}`,
+        `http://localhost:5000/api/campaigns/${selectedCampaign._id}`,
         {
           method: 'PUT',
           headers: {

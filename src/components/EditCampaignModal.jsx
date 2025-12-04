@@ -29,7 +29,7 @@ const EditCampaignModal = ({ campaignId }) => {
 
   // Fetch Data
   useEffect(() => {
-    axios.get(`https://winexch.blog/api/data/vendors/${vendor._id}`).then((res) => {
+    axios.get(`http://localhost:5000/api/data/vendors/${vendor._id}`).then((res) => {
       setForm(res.data);
     });
   }, [campaignId]);
@@ -86,7 +86,7 @@ const EditCampaignModal = ({ campaignId }) => {
   // Submit Update
   const submitForm = async () => {
     try {
-      await axios.put(`https://winexch.blog/api/campaign/${campaignId}`, form)
+      await axios.put(`http://localhost:5000/api/campaign/${campaignId}`, form)
 ;
       alert("Campaign Updated Successfully!");
     } catch (error) {

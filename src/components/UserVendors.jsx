@@ -62,7 +62,7 @@ const UserVendors = () => {
 
     try {
       const response = await fetch(
-        `https://winexch.blog/api/data/vendors/user/${userId}`
+        `http://localhost:5000/api/data/vendors/user/${userId}`
       );
 
       if (!response.ok) {
@@ -116,7 +116,7 @@ const UserVendors = () => {
 
     try {
       const response = await fetch(
-        `https://winexch.blog/api/data/vendors/${vendorId}`,
+        `http://localhost:5000/api/data/vendors/${vendorId}`,
         {
           method: "DELETE",
         }

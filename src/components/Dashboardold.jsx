@@ -6,7 +6,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get("https://winexch.blog/api/data/vendors")
+      .get("http://localhost:5000/api/data/vendors")
       .then((res) => setVendors(res.data));
   }, []);
 

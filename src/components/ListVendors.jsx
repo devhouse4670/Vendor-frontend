@@ -8,7 +8,7 @@ const VendorList = () => {
 
   const fetchVendors = async () => {
     try {
-      const res = await axios.get("https://winexch.blog/api/data/vendors");
+      const res = await axios.get("http://localhost:5000/api/data/vendors");
       setVendors(res.data);
     } catch (err) {
       console.error("Failed to fetch vendors", err);
@@ -19,7 +19,7 @@ const VendorList = () => {
     if (!window.confirm("Are you sure you want to delete this vendor?")) return;
 
     try {
-      await axios.delete(`https://winexch.blog/api/data/vendors/${id}`);
+      await axios.delete(`http://localhost:5000/api/data/vendors/${id}`);
       fetchVendors();
     } catch (err) {
       console.error("Delete failed", err);

@@ -46,7 +46,7 @@ const CreateCampaign = ({ vendorId, onClose }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://winexch.blog/api/data/campaigns", {
+      const res = await fetch("http://localhost:5000/api/data/campaigns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(campaign),

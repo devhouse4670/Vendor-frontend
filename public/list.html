@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vendor List</title>
+</head>
+<body>
+  <h1>Vendor List</h1>
+  <ul id="vendorList"></ul>
+
+  <script>
+    async function fetchVendors() {
+      try {
+        const response = await fetch("http://localhost:5000/vendors");
+        const vendors = await response.json();
+
+        const list = document.getElementById("vendorList");
+        list.innerHTML = "";
+
+        vendors.forEach(vendor => {
+          const li = document.createElement("li");
+          li.textContent = `${vendor.name} - ${vendor.email}`;
+          list.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Error fetching vendors:", error);
+      }
+    }
+
+    // Fetch vendors when page loads
+    fetchVendors();
+  </script>
+</body>
+</html>

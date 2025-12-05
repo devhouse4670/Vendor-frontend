@@ -1,5 +1,6 @@
 // src/config/api.js (Frontend)
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = 'https://vendor-backend-five.vercel.app/';
 
 export const API_ENDPOINTS = {
   // Vendor endpoints

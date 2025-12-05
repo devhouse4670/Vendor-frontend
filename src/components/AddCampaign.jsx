@@ -1,5 +1,5 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddCampaign = ({ vendorId, vendorName, onClose }) => {
   const [form, setForm] = useState({
@@ -20,14 +20,58 @@ const AddCampaign = ({ vendorId, vendorName, onClose }) => {
     bankDetails: "",
     msg: "",
     extra: "",
+    status: "Active",
     payments: [{ date: "", amount: "" }],
     campaignLinks: [{ heading: "", url: "" }]
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+    useEffect(() => {
+    console.log("=== AddCampaign Props ===");
+    console.log("vendorId:", vendorId);
+    console.log("vendorName:", vendorName);
+    console.log("typeof vendorId:", typeof vendorId);
+    console.log("========================");
+  }, [vendorId, vendorName]);
+  // Get user ID from localStorage
+  const getUserId = () => {
+  // Check direct userId
+  let userId = localStorage.getItem("userId");
+  if (userId) return userId;
+
+  // Check user object
+  const userStr = localStorage.getItem("user");
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      userId = user._id || user.id;
+      if (userId) return userId;
+    } catch (e) {
+      console.error("Error parsing user from localStorage:", e);
+    }
+  }
+
+  // Check alternative keys
+  userId = localStorage.getItem("user_id") || localStorage.getItem("id");
+  if (userId) return userId;
+
+  // Log all localStorage keys for debugging
+  console.log("Available localStorage keys:", Object.keys(localStorage));
+  console.log("localStorage contents:", {
+    userId: localStorage.getItem("userId"),
+    user_id: localStorage.getItem("user_id"),
+    id: localStorage.getItem("id"),
+    user: localStorage.getItem("user")
+  });
+
+  return null;
+};
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError(""); // Clear error when user types
   };
 
   const addPaymentRow = () => {
@@ -67,56 +111,118 @@ const AddCampaign = ({ vendorId, vendorName, onClose }) => {
   };
 
   const saveCampaign = async () => {
+    // ADD DEBUG LOGS HERE
+    console.log("=== SAVE CAMPAIGN ===");
+    console.log("vendorId when saving:", vendorId);
+    console.log("vendorName when saving:", vendorName);
+    console.log("====================");
+
     // Validation
     if (!form.campaignName.trim()) {
-      alert("Campaign Name is required!");
+      setError("Campaign Name is required!");
       return;
     }
 
     if (!form.campaignId.trim()) {
-      alert("Campaign ID is required!");
+      setError("Campaign ID is required!");
       return;
     }
 
-    try {
-      setLoading(true);
-
-      // Filter out empty payment rows
-      const validPayments = form.payments.filter(
-        p => p.date && p.amount
-      );
-
-      // Filter out empty link rows
-      const validLinks = form.campaignLinks.filter(
-        link => link.heading && link.url
-      );
-
-      const campaignData = {
-        ...form,
-        vendorId,
-        payments: validPayments,
-        campaignLinks: validLinks
-      };
-
-      const res = await axios.post(
-        "http://localhost:5000/api/campaigns",
-        campaignData
-      );
-
-      alert("Campaign Created Successfully!");
-      onClose();
-    } catch (err) {
-      console.error("Error creating campaign:", err);
-      
-      if (err.response?.data?.message) {
-        alert(`Error: ${err.response.data.message}`);
-      } else {
-        alert("Error Creating Campaign. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+    // Check vendorId prop
+    if (!vendorId) {
+      console.error("ERROR: vendorId is missing! Value:", vendorId);
+      setError("Vendor ID is missing. Please try again.");
+      return;
     }
-  };
+
+  if (!form.campaignId.trim()) {
+    setError("Campaign ID is required!");
+    return;
+  }
+
+  // Check vendorId prop
+  if (!vendorId) {
+    console.error("vendorId is:", vendorId); // More debug
+    setError("Vendor ID is missing. Please try again.");
+    return;
+  }
+
+  // Add this near the top of your AddCampaign component, after the state declarations
+
+
+  // Check vendorId prop
+  if (!vendorId) {
+    setError("Vendor ID is missing. Please try again.");
+    console.error("vendorId prop is:", vendorId);
+    return;
+  }
+
+  const userId = getUserId();
+  if (!userId) {
+    setError("User ID not found. Please login again.");
+    console.error("Failed to retrieve userId from localStorage");
+    return;
+  }
+
+  console.log("userId:", userId);
+  console.log("vendorId:", vendorId);
+
+  try {
+    setLoading(true);
+    setError("");
+
+    const validPayments = form.payments.filter(p => p.date && p.amount);
+    const validLinks = form.campaignLinks.filter(link => link.heading && link.url);
+
+    const campaignData = {
+      ...form,
+      userId,
+      vendorId,
+      payments: validPayments,
+      campaignLinks: validLinks
+    };
+
+    console.log("Campaign data being sent:", campaignData);
+
+    const url = API_ENDPOINTS.CAMPAIGNS;
+    console.log("Sending POST request to:", url);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(campaignData),
+    });
+
+    console.log("Response status:", response.status);
+
+    const contentType = response.headers.get("content-type");
+    
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response body:", text);
+      throw new Error(`Server returned ${response.status}: ${text.substring(0, 200)}`);
+    }
+
+    const data = await response.json();
+    console.log("Response data:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || data.error || "Failed to create campaign");
+    }
+
+    alert("Campaign Created Successfully!");
+    onClose();
+  } catch (err) {
+    console.error("Full error:", err);
+    setError(err.message || "Error Creating Campaign. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // Rest of your JSX remains the same...
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
@@ -126,6 +232,16 @@ const AddCampaign = ({ vendorId, vendorName, onClose }) => {
             Add Campaign for {vendorName}
           </h2>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
 
         {/* Basic Info */}
         <div className="space-y-4">
@@ -239,7 +355,6 @@ const AddCampaign = ({ vendorId, vendorName, onClose }) => {
               <input
                 name="btagPassword"
                 placeholder="B-Tag Login Password"
-                type="password"
                 className="border border-gray-300 p-2.5 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 onChange={handleChange}
                 value={form.btagPassword}
@@ -296,6 +411,22 @@ const AddCampaign = ({ vendorId, vendorName, onClose }) => {
                 value={form.endDate}
               />
             </div>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+            <select
+              name="status"
+              className="border border-gray-300 p-2.5 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              onChange={handleChange}
+              value={form.status}
+            >
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+              <option value="Future">Future</option>
+            </select>
           </div>
 
           {/* Bank Details */}

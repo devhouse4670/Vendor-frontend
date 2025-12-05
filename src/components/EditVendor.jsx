@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
+import { API_ENDPOINTS } from "../config/api";
+
 const EditVendor = () => {
   const { id } = useParams();
   const [vendor, setVendor] = useState({
@@ -15,11 +17,21 @@ const EditVendor = () => {
     handledBy: "",
     status: ""
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/data/vendors/${id}`)
-      .then((res) => setVendor(res.data))
-      .catch((err) => console.log(err));
+    const fetchVendor = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.VENDOR_BY_ID(id));
+        const data = await res.json();
+        setVendor(data);
+      } catch (err) {
+        console.log(err);
+        alert("Failed to load vendor data");
+      }
+    };
+
+    fetchVendor();
   }, [id]);
 
   const handleChange = (e) => {
@@ -28,11 +40,27 @@ const EditVendor = () => {
 
   const updateVendor = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/data/vendors/${id}`, vendor);
-      alert("Vendor updated successfully!");
-      window.location.href = "/vendors";
+      setLoading(true);
+      const res = await fetch(API_ENDPOINTS.VENDOR_BY_ID(id), {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(vendor),
+      });
+
+      if (res.ok) {
+        alert("Vendor updated successfully!");
+        window.location.href = "/vendors";
+      } else {
+        const data = await res.json();
+        alert(data.message || data.error || "Update failed!");
+      }
     } catch (err) {
+      console.error(err);
       alert("Update failed!");
+    } finally {
+      setLoading(false);
     }
   };
 

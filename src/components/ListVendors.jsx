@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiEdit, FiTrash2, FiSearch } from "react-icons/fi";
+import { API_ENDPOINTS } from "../config/api";
 
 const VendorList = () => {
   const [vendors, setVendors] = useState([]);
@@ -8,8 +9,8 @@ const VendorList = () => {
 
   const fetchVendors = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/data/vendors");
-      setVendors(res.data);
+const res = await axios.get(API_ENDPOINTS.VENDORS);
+// data is in res.data      setVendors(res.data);
     } catch (err) {
       console.error("Failed to fetch vendors", err);
     }
@@ -19,7 +20,7 @@ const VendorList = () => {
     if (!window.confirm("Are you sure you want to delete this vendor?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/data/vendors/${id}`);
+await axios.delete(API_ENDPOINTS.VENDOR_BY_ID(id));
       fetchVendors();
     } catch (err) {
       console.error("Delete failed", err);

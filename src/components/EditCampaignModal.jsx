@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const EditCampaignModal = ({ campaignId }) => {
+import { API_ENDPOINTS } from "../config/api";
+
+const EditCampaignModal = ({ campaignId, onClose }) => {
   const [form, setForm] = useState({
     vendorId: "",
     campaignName: "",
@@ -26,12 +28,24 @@ const EditCampaignModal = ({ campaignId }) => {
     campaignLinks: [],
     payments: [],
   });
+  const [loading, setLoading] = useState(false);
 
   // Fetch Data
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/data/vendors/${vendor._id}`).then((res) => {
-      setForm(res.data);
-    });
+    const fetchCampaign = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.CAMPAIGN_BY_ID(campaignId));
+        const data = await res.json();
+        setForm(data);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load campaign data");
+      }
+    };
+
+    if (campaignId) {
+      fetchCampaign();
+    }
   }, [campaignId]);
 
   // Handle Input Change
@@ -56,8 +70,7 @@ const EditCampaignModal = ({ campaignId }) => {
 
   // Remove Link
   const removeLink = (index) => {
-    const updated = [...form.campaignLinks];
-    updated.splice(index, 1);
+    const updated = form.campaignLinks.filter((_, i) => i !== index);
     setForm({ ...form, campaignLinks: updated });
   };
 
@@ -78,20 +91,34 @@ const EditCampaignModal = ({ campaignId }) => {
 
   // Remove Payment
   const removePayment = (index) => {
-    const updated = [...form.payments];
-    updated.splice(index, 1);
+    const updated = form.payments.filter((_, i) => i !== index);
     setForm({ ...form, payments: updated });
   };
 
   // Submit Update
   const submitForm = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/campaign/${campaignId}`, form)
-;
-      alert("Campaign Updated Successfully!");
+      setLoading(true);
+      const res = await fetch(API_ENDPOINTS.CAMPAIGN_BY_ID(campaignId), {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (res.ok) {
+        alert("Campaign Updated Successfully!");
+        if (onClose) onClose();
+      } else {
+        const data = await res.json();
+        alert(data.message || data.error || "Error updating campaign");
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert("Error updating campaign");
+    } finally {
+      setLoading(false);
     }
   };
 

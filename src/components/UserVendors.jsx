@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const UserVendors = () => {
   const [vendors, setVendors] = useState([]);
@@ -61,10 +62,7 @@ const UserVendors = () => {
     console.log("Fetching vendors for user:", userId);
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/data/vendors/user/${userId}`
-      );
-
+      const response = await fetch(API_ENDPOINTS.VENDORS_BY_USER(userId));
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -110,29 +108,27 @@ const UserVendors = () => {
   };
 
   const handleDelete = async (vendorId) => {
-    if (!window.confirm("Are you sure you want to delete this vendor?")) {
-      return;
-    }
+  if (!window.confirm("Are you sure you want to delete this vendor?")) {
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/data/vendors/${vendorId}`,
-        {
-          method: "DELETE",
-        }
-      );
+  try {
+    const response = await fetch(API_ENDPOINTS.VENDOR_BY_ID(vendorId), {
+      method: "DELETE",
+    });
 
-      if (response.ok) {
-        setVendors(vendors.filter((v) => v._id !== vendorId));
-        alert("Vendor deleted successfully!");
-      } else {
-        alert("Failed to delete vendor");
-      }
-    } catch (error) {
-      console.error("Error deleting vendor:", error);
-      alert("Error deleting vendor");
+    if (response.ok) {
+      setVendors(vendors.filter((v) => v._id !== vendorId));
+      alert("Vendor deleted successfully!");
+    } else {
+      const data = await response.json();
+      alert(data.message || data.error || "Failed to delete vendor");
     }
-  };
+  } catch (error) {
+    console.error("Error deleting vendor:", error);
+    alert("Error deleting vendor");
+  }
+};
 
   if (loading) {
     return (

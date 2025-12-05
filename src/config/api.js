@@ -9,9 +9,11 @@ export const API_ENDPOINTS = {
   
   // Campaign endpoints
   CAMPAIGNS: `${API_BASE_URL}/api/data/campaigns`,
+  CAMPAIGN_BY_ID: (id) => `${API_BASE_URL}/api/data/campaigns/${id}`,
   CAMPAIGNS_BY_USER: (userId) => `${API_BASE_URL}/api/data/campaigns/user/${userId}`,
   CAMPAIGNS_BY_VENDOR: (vendorId) => `${API_BASE_URL}/api/data/campaigns/vendor/${vendorId}`,
 };
+
 
 // Auth API functions
 export const authAPI = {

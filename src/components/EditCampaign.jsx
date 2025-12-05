@@ -251,16 +251,13 @@ const EditCampaign = ({ isOpen, onClose, campaign, onSubmit }) => {
                 placeholder="B-Tag Login ID"
                 className="border border-gray-300 p-2.5 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 onChange={handleChange}
-                value={form.btagLogin}
               />
 
               <input
                 name="btagPassword"
                 placeholder="B-Tag Login Password"
-                type="password"
                 className="border border-gray-300 p-2.5 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 onChange={handleChange}
-                value={form.btagPassword}
               />
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AddVendor from "./AddVendor";
 import CreateCampaign from "./CreateCampaign";
+import { API_ENDPOINTS } from "../config/api";
 
 export default function UserDashboard() {
   const [user, setUser] = useState({});
@@ -50,9 +51,8 @@ export default function UserDashboard() {
 
   const fetchVendors = async (userId) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/data/vendors/user/${userId}`
-      );
+   const res = await fetch(API_ENDPOINTS.VENDORS_BY_USER(userId));
+      
       const data = await res.json();
       console.log("Fetched vendors:", data);
 
@@ -70,9 +70,7 @@ export default function UserDashboard() {
 
   const fetchCampaigns = async (userId) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/data/campaigns/user/${userId}`
-      );
+      const res = await fetch(API_ENDPOINTS.CAMPAIGNS_BY_USER(userId));
       const data = await res.json();
       console.log("Fetched campaigns:", data);
 

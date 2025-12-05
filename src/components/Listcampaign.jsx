@@ -2,21 +2,46 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+import { API_ENDPOINTS } from "../config/api";
+
 function AddCampaigns() {
   const [campaigns, setCampaigns] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/campaigns")
-      .then((res) => setCampaigns(res.data))
-      .catch((err) => console.error(err));
+    const fetchCampaigns = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.CAMPAIGNS);
+        const data = await res.json();
+        setCampaigns(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCampaigns();
   }, []);
 
-  const deleteCampaign = (id) => {
-    axios
-      .delete(`http://localhost:5000/api/campaigns/${id}`)
-      .then(() => setCampaigns(campaigns.filter((c) => c._id !== id)))
-      .catch((err) => console.error(err));
+  const deleteCampaign = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this campaign?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(API_ENDPOINTS.CAMPAIGN_BY_ID(id), {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setCampaigns(campaigns.filter((c) => c._id !== id));
+        alert("Campaign deleted successfully!");
+      } else {
+        const data = await res.json();
+        alert(data.message || data.error || "Failed to delete campaign");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting campaign");
+    }
   };
 
   return (

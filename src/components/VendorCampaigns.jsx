@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AddCampaign from "./AddCampaign";
 import EditCampaign from "./EditCampaign";
+import { API_ENDPOINTS } from "../config/api";
 
 const VendorCampaigns = () => {
   const { vendorId } = useParams();
@@ -25,8 +26,7 @@ const VendorCampaigns = () => {
 
   const fetchVendor = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/vendors/${vendorId}`);
-      
+      const response = await fetch(API_ENDPOINTS.VENDOR_BY_ID(vendorId));
       const data = await response.json();
       setVendor(data);
     } catch (error) {
@@ -36,13 +36,20 @@ const VendorCampaigns = () => {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/campaigns/vendor/${vendorId}`
-      );
+      const res = await fetch(API_ENDPOINTS.CAMPAIGNS_BY_VENDOR(vendorId));
       const data = await res.json();
-      setCampaigns(data);
+      
+      // Handle both array and object with data property
+      if (Array.isArray(data)) {
+        setCampaigns(data);
+      } else if (data.data && Array.isArray(data.data)) {
+        setCampaigns(data.data);
+      } else {
+        setCampaigns([]);
+      }
     } catch (err) {
       console.log("Failed to load campaigns", err);
+      setCampaigns([]);
     }
   };
 
@@ -70,7 +77,7 @@ const VendorCampaigns = () => {
   const handleUpdate = async (updatedData) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/campaigns/${selectedCampaign._id}`,
+        API_ENDPOINTS.CAMPAIGN_BY_ID(selectedCampaign._id),
         {
           method: 'PUT',
           headers: {
@@ -83,6 +90,7 @@ const VendorCampaigns = () => {
       if (response.ok) {
         console.log("Campaign updated successfully");
         setModalOpen(false);
+        setSelectedCampaign(null);
         fetchCampaigns(); // Refresh the campaigns list
       } else {
         console.error("Failed to update campaign");
@@ -166,33 +174,43 @@ const VendorCampaigns = () => {
                   className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
                 />
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
+{showAddCampaign && (
+  <AddCampaign
+    vendorId={vendorId}  // Use the vendorId from useParams, not vendor.vendorId
+    vendorName={vendor?.name || ""}
+    onClose={() => {
+      setShowAddCampaign(false);
+      fetchCampaigns();
+    }}
+  />
+)}
+           <button
+  onClick={() => {
+    setSelectedCampaign(null);
+    setShowAddCampaign(true);
+  }}
+  className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+>
+  + Add Campaign
+</button>
 
-              <button
-                onClick={() => {
-                  setSelectedCampaign(null);
-                  setShowAddCampaign(true);
-                }}
-                className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-              >
-                + Add Campaign
-              </button>
+{showAddCampaign && (
+  <AddCampaign
+    vendorId={vendor?.vendorId || vendor?._id}
+    vendorName={vendor?.name}
+    onClose={() => {
+      setShowAddCampaign(false);
+      fetchCampaigns();
+    }}
+  />
+)}
+              
             </div>
 
-            {showAddCampaign && (
-              <AddCampaign
-                vendorId={vendor.vendorId}
-                vendorName={vendor.name}
-                existing={selectedCampaign}
-                onClose={() => {
-                  setShowAddCampaign(false);
-                  fetchCampaigns();
-                }}
-              />
-            )}
-
+          
             {/* CAMPAIGN CARDS */}
             {filteredCampaigns.length > 0 ? (
               <div className="space-y-4">
@@ -308,12 +326,6 @@ const VendorCampaigns = () => {
                           </svg>
                           Edit Campaign
                         </button>
-                        <EditCampaign
-  isOpen={modalOpen}
-  onClose={() => setModalOpen(false)}
-  campaign={selectedCampaign}
-  onSubmit={handleUpdate}
-/>
                       </div>
 
                     </div>
@@ -335,7 +347,18 @@ const VendorCampaigns = () => {
         </>
       )}
 
-     
+      {/* EDIT MODAL - Moved outside to prevent duplicate renders */}
+      {modalOpen && selectedCampaign && (
+        <EditCampaign
+          isOpen={modalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedCampaign(null);
+          }}
+          campaign={selectedCampaign}
+          onSubmit={handleUpdate}
+        />
+      )}
     </div>
   );
 };

@@ -3,6 +3,17 @@
 // Use deployed backend URL (no slash at end)
 const API_BASE_URL = process.env.REACT_APP_API_URL || "https://vendor-backend.onrender.com";
 
+
+// In your api.js
+const response = await fetch('https://vendor-backend.onrender.com/api/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include', // This sends cookies
+  body: JSON.stringify(data)
+});
+
 export const API_ENDPOINTS = {
   // Vendor endpoints
   VENDORS: `${API_BASE_URL}/api/data/vendors`,

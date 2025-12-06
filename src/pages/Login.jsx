@@ -32,11 +32,11 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const response = await authAPI.login(formData);
+      const response = await authAPI.login(formData, { withCredentials: true });
 
       // Store token and user data
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      // localStorage.setItem("user", JSON.stringify(response.data.user));
 
       // Redirect to dashboard
       navigate("/userdashboard");

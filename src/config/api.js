@@ -16,16 +16,14 @@ export const API_ENDPOINTS = {
   CAMPAIGNS_BY_VENDOR: (vendorId) => `${API_BASE_URL}/api/data/campaigns/vendor/${vendorId}`,
 };
 
-// AUTH API
 export const authAPI = {
   login: async (credentials) => {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(credentials),
-  credentials: "include",   // this tells fetch to send cookies and auth headers
-});
-
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+      credentials: "include",   // this tells fetch to send cookies and auth headers
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -37,6 +35,8 @@ export const authAPI = {
     const data = await response.json();
     return { data: { token: data.token, user: data.user } };
   },
+};
+
 
   register: async (userData) => {
     const response = await fetch(`${API_BASE_URL}/api/auth/register`, {

@@ -23,7 +23,7 @@ export const authAPI = {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(credentials),
-  credentials: "include",   // <-- SUPER IMPORTANT
+  credentials: "include",   // this tells fetch to send cookies and auth headers
 });
 
 

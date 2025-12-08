@@ -1,6 +1,6 @@
 // src/config/api.js
 // Use deployed backend URL (no slash at end)
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://vendor-backend.onrender.com";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://winexch.blog/https://winexch.blog/";
 
 export const API_ENDPOINTS = {
   // Vendor endpoints
